@@ -1,11 +1,11 @@
 import crypto from "crypto";
 import { GoogleGenAI } from "@google/genai";
-import { queryAsync } from "../config/db.js";
+import dbPool from "../config/db.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export function calculateCosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) return 0;
+  if (!vectorA || !vectorB || vectorA.length !== vectorB.length) return 0;
   
   let dotProduct = 0;
   let normA = 0;
@@ -32,7 +32,7 @@ export async function processSemanticSimilarity(resumeText, jobDescription) {
     const jdHash = generateJDHash(jobDescription);
     let jdVector = null;
 
-    const existingRows = await queryAsync(
+    const [existingRows] = await dbPool.query(
       "SELECT embedding FROM job_embeddings WHERE job_hash = ?",
       [jdHash]
     );
@@ -55,7 +55,7 @@ export async function processSemanticSimilarity(resumeText, jobDescription) {
 
     if (!vectorB && jdEmbeddingResponse) {
       vectorB = jdEmbeddingResponse.embedding.values;
-      await queryAsync(
+      await dbPool.query(
         "INSERT IGNORE INTO job_embeddings (job_hash, embedding) VALUES (?, ?)",
         [jdHash, JSON.stringify(vectorB)]
       );
@@ -64,7 +64,7 @@ export async function processSemanticSimilarity(resumeText, jobDescription) {
 
     return calculateCosineSimilarity(vectorA, vectorB);
   } catch (embedError) {
-    console.error("⚠️ Embedding failure, fallback to default baseline:", embedError.message);
+    console.error("⚠️ Embedding failure, falling back to default baseline:", embedError.message);
     return 0.5;
   }
 }

@@ -2,19 +2,19 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_jwt_key_123!";
 
-export function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+export const authenticateToken = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: "Access denied. Token missing!" });
-  }
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid or expired token!" });
+    if (!authHeader) {
+      return res.status(401).json({ message: "Access token required." });
     }
-    req.user = user;
+
+    const token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+    req.user = jwt.verify(token, JWT_SECRET);
+
     next();
-  });
-}
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token." });
+  }
+};

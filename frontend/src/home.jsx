@@ -42,16 +42,17 @@ function Home() {
       </div>
 
       <div className="how-it-works">
-        <h2>How It Works</h2>
-        <div className="steps">
-          <div className="step"><span className="step-num">1</span><p>Upload your PDF or TXT resume</p></div>
-          <div className="step-arrow">→</div>
-          <div className="step"><span className="step-num">2</span><p>Paste the job description (optional)</p></div>
-          <div className="step-arrow">→</div>
-          <div className="step"><span className="step-num">3</span><p>Get your detailed ATS report</p></div>
-        </div>
-        <Link to="/login" className="how-it-works-button">Get Started Free</Link>
-      </div>
+  <h2>How It Works</h2>
+  <div className="steps">
+    {/* Updated text to include DOCX */}
+    <div className="step"><span className="step-num">1</span><p>Upload your PDF, DOCX, or TXT resume</p></div>
+    <div className="step-arrow">→</div>
+    <div className="step"><span className="step-num">2</span><p>Paste the job description (optional)</p></div>
+    <div className="step-arrow">→</div>
+    <div className="step"><span className="step-num">3</span><p>Get your detailed ATS report</p></div>
+  </div>
+  <Link to="/login" className="how-it-works-button">Get Started Free</Link>
+</div>
 
       <footer className="footer">
         &copy; {new Date().getFullYear()} InterviewReady. All rights reserved.

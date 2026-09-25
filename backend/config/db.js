@@ -1,30 +1,17 @@
-import mysql from "mysql";
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
 
-const DB_CONFIG = {
+dotenv.config();
+
+const db = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "crud",
-  port: process.env.DB_PORT || 4306,
-};
-
-const dbPool = mysql.createPool(DB_CONFIG);
-
-dbPool.getConnection((err, connection) => {
-  if (err) console.error(`DB Failed ❌: ${err.message}`);
-  else {
-    console.log("DB Connected ✅");
-    connection.release();
-  }
+  port: Number(process.env.DB_PORT) || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-export const queryAsync = (sql, params) => {
-  return new Promise((resolve, reject) => {
-    dbPool.query(sql, params, (err, results) => {
-      if (err) reject(err);
-      else resolve(results);
-    });
-  });
-};
-
-export default dbPool;
+export default db;
